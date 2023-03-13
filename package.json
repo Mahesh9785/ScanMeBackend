@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./server.js",
+    "dev": "nodemon server.js",
     "pretty": "prettier --write \"./**/*.{ts,js,html,css}\""
   },
   "author": "Mahesh Sharma",
@@ -17,7 +17,9 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongoose": "^7.0.1",
-    "prettier": "^2.8.4"
+    "nodemailer": "^6.9.1",
+    "prettier": "^2.8.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.21"
