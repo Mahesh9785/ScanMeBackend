@@ -3,6 +3,7 @@ const userRoute = express();
 const registerUser = require("../controller/RegistrationController");
 const verifyUser = require("../controller/LoginController");
 const verifyEmail = require("../controller/VerificationController");
+const qrCode = require("../controller/QrCodeController");
 const path=require("path");
 
 
@@ -24,6 +25,6 @@ userRoute.get("/user/verified", (req, res) => {
     res.sendFile(path.join( __dirname, "./../views/verified.html"));
 })
 
-userRoute.post("/save-qr",)
+userRoute.post("/save-qr",qrCode.saveQr);
 
 module.exports = userRoute;
