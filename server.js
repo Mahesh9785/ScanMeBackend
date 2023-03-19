@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const path = require('path');
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
@@ -18,6 +19,8 @@ app.use(
     extended: false,
   })
 );
+
+app.use(express.static(path.join(__dirname)));
 
 app.use(cors());
 

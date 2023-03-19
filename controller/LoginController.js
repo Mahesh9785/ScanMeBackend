@@ -4,12 +4,7 @@ const bcrypt = require("bcryptjs");
 // Authenticating a user
 const verifyUser = async (req, res) => {
   try {
-      
-      //password hashing
-      const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(req.body.password, salt);
-      //console.log(hash)
-      
+     
       const result = await User.findOne({ email: req.body.email }); //retrieves the document that match the provided email address
       console.log("result"+result)
       
@@ -18,7 +13,7 @@ const verifyUser = async (req, res) => {
 
         // check if user is verified
         if (!result.verified) {
-            res.json({
+            res.status(500).json({
             status: "FAILED",
             message: "Email hasn't been verified yet. Check your inbox",
             });
@@ -45,16 +40,16 @@ const verifyUser = async (req, res) => {
     }
     }else{
         //if no user with the provided email exists
-        res.json({ 
+        res.status(500).json({ 
             status:"FAILED",
             message: "No such Email ID exists, If you are a new user please register" 
         });
     }
     } catch (err) {
         console.log(err)
-        res.json({ 
+        res.status(500).json({ 
             status:"FAILED",
-            message: JSON.stringify(err)
+            message:err
         });
   }
 };

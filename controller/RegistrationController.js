@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
     const existingUser = await User.findOne({ email }).lean().exec();
 
     if (existingUser) {
-      res.json({
+      res.status(500).json({
         status: "FAILED",
         message: "User with the provided email already exists",
       });
@@ -61,7 +61,7 @@ const registerUser = async (req, res) => {
     }
   } catch (error) {
     //when there is some error while registering
-    res.json({
+    res.status(500).json({
       status: "FAILED",
       message: "An error occurred while registering user",
     });
@@ -146,7 +146,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
   const saltRounds = 10;
   bcrypt.hash(uniqueString, saltRounds,async (err, hashedUniqueString) => {
     if (err){
-      res.json({
+      res.status(500).json({
         status: "FAILED",
         message: "An error occurred while hashing email data!",
       });
@@ -163,7 +163,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
       await newVerification.save();
           transporter.sendMail(mailOptions, async (err, info)=>{
             if (err){
-              res.json({
+              res.status(500).json({
                 status: "FAILED",
                 message: "Please provide a valid email address"+ err,
               });
@@ -178,7 +178,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
           });
       }catch(error){
           console.log(error);
-          res.json({
+          res.status(500).json({
             status: "FAILED",
             message: "Couldn't save verification email data!",
           });

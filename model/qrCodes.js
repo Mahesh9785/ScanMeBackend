@@ -7,17 +7,14 @@ let qrCodes = new Schema(
       type: String,
       required : true
     },
-    qrCodes:[
-      {
-    qrName: {
-      type: String,
+    qrCodes:{    
+      type: Array,
       required : true
+    // qrCode: {
+    //   type: String,
+    //   required : true
+    // },
     },
-    qrCode: {
-      type: String,
-      required : true
-    },
-  }],
   },
   {
     collection: "qrCodes",
