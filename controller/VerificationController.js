@@ -6,7 +6,7 @@ const path=require("path");
 // verify email
 const verifyEmail = async (req, res) => {
   let { userId, uniqueString } = req.params;
-  await UserVerification.find({ userId })
+  await UserVerification.find({ userId:userId })
     .then(async (result) => {
       if (result.length > 0) {
         console.log(result[0]);
@@ -37,13 +37,15 @@ const verifyEmail = async (req, res) => {
         } else {
             // valid record exists so we validate the user string
             // First compare the hashed unique string
+            console.log("uniqueString",uniqueString);
+            console.log("hashedUniqueString",hashedUniqueString);
             console.log(await bcrypt.compare(uniqueString, hashedUniqueString));
             if(await bcrypt.compare(uniqueString, hashedUniqueString))
             {
             if (result) {
             // strings match
             await User
-            .updateOne ({id: userId}, {verified: true})
+            .updateOne({_id: userId},{verified: true})
             .then(() => {
                 UserVerification
                 .deleteOne({userId})

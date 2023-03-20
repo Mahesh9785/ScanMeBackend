@@ -35,7 +35,7 @@ const registerUser = async (req, res) => {
 
   try {
     //checking whether any user with the same email exists or not
-    const existingUser = await User.findOne({ email }).lean().exec();
+    const existingUser = await User.findOne({ email }).exec();
 
     if (existingUser) {
       res.status(500).json({
@@ -73,6 +73,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
   // url to be used in the email
   const currentUrl = "http://localhost:3000/";
   const uniqueString = uuidv4() + _id;
+  console.log(uniqueString)
 
   // mail options
   const mailOptions = {

@@ -21,8 +21,5 @@
     "nodemailer": "^6.9.1",
     "prettier": "^2.8.4",
     "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.21"
   }
 }
