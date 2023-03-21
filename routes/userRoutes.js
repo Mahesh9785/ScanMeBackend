@@ -6,6 +6,7 @@ const verifyUser = require("../controller/LoginController");
 const verifyEmail = require("../controller/VerificationController");
 const qrCode = require("../controller/QrCodeController");
 const update = require("../controller/UpdateController");
+const sendMail = require("../controller/SendMailController");
 const path=require("path");
 
 
@@ -54,8 +55,10 @@ userRoute.get("/user/verified", (req, res) => {
     res.sendFile(path.join( __dirname, "./../views/verified.html"));
 })
 
+//save user qrCode
 userRoute.post("/save-qr/:userId",qrCode.upload.single('file'),qrCode.saveQr);
 
+//save user profile picture
 userRoute.post("/save-profile-picture/:userId",update.upload.single('image'),(req,res)=>{
   res.json({
     success:req.file,
@@ -64,10 +67,16 @@ userRoute.post("/save-profile-picture/:userId",update.upload.single('image'),(re
   });
 });
 
+//send qr of a particular user
 userRoute.get('/getQRCodes/:userId',qrCode.sendQr);
 
+//update user account details
 userRoute.post("/update/:userId",update.updateUser);
 
+//update user password
 userRoute.post("/update_password/:userId",update.updatePassword);
+
+//verify user email
+userRoute.post("/send-mail/:userId", sendMail.sendMailWithAttachment);
 
 module.exports = userRoute;
