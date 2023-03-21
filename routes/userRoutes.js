@@ -68,4 +68,6 @@ userRoute.get('/getQRCodes/:userId',qrCode.sendQr);
 
 userRoute.post("/update/:userId",update.updateUser);
 
+userRoute.post("/update_password/:userId",update.updatePassword);
+
 module.exports = userRoute;

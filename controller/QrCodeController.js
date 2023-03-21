@@ -19,10 +19,32 @@ const storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const userId = req.params.userId;
+
     console.log(file.originalname);
     const filename = file.originalname.replace(/:/g, '-');
     qrCodeImageName=userId+'_'+ filename;
-    cb(null, userId+'_'+ filename);
+    // cb(null, userId+'_'+ filename);
+    const fileExt = file.mimetype.split('/')[1];
+    const filePattern = new RegExp(`^${userId}_\\w+\\.(.+)$`);
+
+      // Check if there is an existing file with the same name but a different extension
+      fs.readdir('public/Profiles', (err, files) => {
+        if (err) {
+          cb(err);
+        } else {
+          const existingFile = files.find((filename) => filePattern.test(filename));
+          if (existingFile) {
+            const existingExt = existingFile.match(filePattern)[1];
+            if (existingExt !== fileExt) {
+              fs.unlink(`public/Profiles/${existingFile}`, (err) => {
+                if (err) cb(err);
+              });
+            }
+          }
+          cb(null, userId+'_'+ filename);
+ // Rename file with user ID and original extension
+        }
+      });
   }
 });
 
@@ -30,15 +52,23 @@ const upload = multer({ storage: storage });
 
 const saveQr = async (req, res) => {
   try {
-    const { userId, qrName } = req.body;
+    const { userId, qrName, qrData } = req.body;
     const existingQrCodes = await qrCodesModel.findOne({ userId:userId }).exec();
+
+    console.log(existingQrCodes)
     
     if (existingQrCodes) {
-      console.log(existingQrCodes.qrCodes.includes(qrName))
-      if (!existingQrCodes.qrCodes.includes(qrName)) {
+      let flag='';
+      for(let qr in existingQrCodes.qrCodes){
+        if(existingQrCodes.qrCodes[qr].qrCodeName==qrName){
+          flag=true;
+        }
+      }
+      if (!flag) {
         existingQrCodes.qrCodes.push({
           qrCodeName:qrName,
-          qrCodeImageName
+          qrCodeData:qrData,
+          qrCodeImageName,
         });
         const savedQrCodes = await existingQrCodes.save();
         res.json({
@@ -48,18 +78,34 @@ const saveQr = async (req, res) => {
           result: savedQrCodes,
         });
       }else{
-        res.json({
-          success: false,
-          status: "FAILED",
-          message: "QR code with the following name already exists",
-        });
-      }
+        const updateResult=await qrCodesModel.updateOne(
+          { userId: userId, 'qrCodes': { $elemMatch: { 'qrCodeName': qrName } } },
+          { $set: { 'qrCodes.$.qrCodeData': qrData } });
+          
+            if (!updateResult) {
+              // handle error
+              res.status(500).json({
+                status: "FAILED",
+                message: "An error occurred while updating QR code",
+                error: err.message,
+              });
+            }else{
+              // result contains the updated document
+              res.json({
+                success: true,
+                status: "UPDATED",
+                message: "QR code with the following name updated",
+              });
+            }
+          }
+      
     } else {
       const newQrCodes = new qrCodesModel({
         userId,
         qrCodes:[
           {
             qrCodeName:qrName,
+            qrCodeData:qrData,
             qrCodeImageName
           }
         ],
@@ -100,7 +146,6 @@ const sendQr = async (req, res) => {
       console.log('Error getting directory information: ' + err);
       res.status(500).send(err);
     } else {
-      const userId = req.params.userId;   
       res.status(200).json({
         status:true,
         data:result,

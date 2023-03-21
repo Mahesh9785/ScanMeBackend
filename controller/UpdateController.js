@@ -1,8 +1,10 @@
 const multer = require('multer');
 const User = require("../model/users");
 const fs = require('fs');
+const bcrypt = require("bcryptjs");
 const path = require('path');
 
+//to save user profile picture in a folder
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const uploadPath = `public/Profiles/`;
@@ -36,6 +38,7 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage });
 
+  //update user account details
   const updateUser = async (req, res) => {
     try {
       const updatedUser = await User.findOneAndUpdate(
@@ -57,6 +60,51 @@ const storage = multer.diskStorage({
         });
         console.log("User updated successfully!");
       }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        status: "FAILED",
+        message: "Internal server error",
+      });
+    }
+  };
+
+  const updatePassword = async (req, res) => {
+    try {
+      console.log(req.body)
+      const updatedUser = await User.findOne(
+        { _id: req.params.userId },
+      );
+      if (!updatedUser) {
+        res.status(500).json({
+          status: "FAILED",
+          message: "User with the provided userId doesn't exist",
+        });
+      } else {
+        if (await bcrypt.compare(req.body.currentPassword, updatedUser.password)) {
+          const hash = bcrypt.hashSync(req.body.newPassword, 10);
+          updatedUser.password=hash;
+          const savedPassword= await updatedUser.save();
+          if(savedPassword){
+        res.status(200).json({
+          success: updatedUser,
+          status: "UPDATED",
+          message: "User password updated successfully!",
+        });
+        console.log("User updated successfully!");
+      }else{
+      res.status(500).json({
+        status: "FAILED",
+        message: "Internal server error",
+      });
+      }
+    }else{
+      res.json({
+        status: "FAILED",
+        message: "Old password doesn't match",
+      });
+    }
+    }
     } catch (err) {
       console.error(err);
       res.status(500).json({
@@ -90,5 +138,6 @@ const getProfilePicture = async (req, res) => {
   module.exports = {
     updateUser,
     getProfilePicture,
+    updatePassword,
     upload
   };

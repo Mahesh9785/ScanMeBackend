@@ -10,6 +10,11 @@ let qrCodes = new Schema(
     qrCodes:[    
       {
     qrCodeName:{
+      unique:true,
+      type: String,
+      required : true
+    },
+    qrCodeData:{
       type: String,
       required : true
     },

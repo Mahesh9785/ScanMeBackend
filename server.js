@@ -12,6 +12,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(
@@ -22,7 +23,11 @@ app.use(
 
 app.use(express.static(path.join(__dirname)));
 
-app.use(cors());
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 const server = http.createServer(app);
 
