@@ -7,6 +7,7 @@ const verifyEmail = require("../controller/VerificationController");
 const qrCode = require("../controller/QrCodeController");
 const update = require("../controller/UpdateController");
 const sendMail = require("../controller/SendMailController");
+const resetPass = require("../controller/ForgotPasswordController")
 const path=require("path");
 
 
@@ -44,8 +45,8 @@ userRoute.get("/getuser/:userId", async (req, res) => {
   }
 });
 
+//send user profile picture
 userRoute.get('/getProfile/:userId',update.getProfilePicture);
-
 
 //verify user email
 userRoute.get("/user/verify/:userId/:uniqueString", verifyEmail.verifyEmail);
@@ -76,7 +77,36 @@ userRoute.post("/update/:userId",update.updateUser);
 //update user password
 userRoute.post("/update_password/:userId",update.updatePassword);
 
+//update user email
+userRoute.post("/update_email",update.sendVerificationEmail);
+
 //verify user email
 userRoute.post("/send-mail/:userId", sendMail.sendMailWithAttachment);
+
+//send forgot-password mail
+userRoute.post('/forgot-password', resetPass.sendResetPassMail);
+
+//reset password page
+userRoute.get('/reset-password/:emailId/:token', async (req, res) => {
+  const { token } = req.params;
+
+  // check if the token exists in the database and is not expired
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+  if (!user) {
+    return res.status(400).send('Invalid or expired token');
+  }
+
+  // render the reset password form with the token as a hidden input field
+  res.sendFile(path.join( __dirname, "./../views/resetPassword.html"),{ params: req.query });
+});
+
+//resetting the password
+userRoute.post('/reset-password',update.resetPassword);
+
+//delete a QR
+userRoute.post("/delete-qr/:userId", qrCode.updateQr);
 
 module.exports = userRoute;

@@ -22,7 +22,13 @@ let user = new Schema(
     verified:{
         type:Boolean,
         default:false
-    }
+    },
+    resetPasswordToken:{
+        type:String,
+    },
+    resetPasswordExpires:{
+      type:String,
+    },
   },
   {
     collection: "users",

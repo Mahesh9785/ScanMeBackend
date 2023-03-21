@@ -80,7 +80,7 @@ const saveQr = async (req, res) => {
       }else{
         const updateResult=await qrCodesModel.updateOne(
           { userId: userId, 'qrCodes': { $elemMatch: { 'qrCodeName': qrName } } },
-          { $set: { 'qrCodes.$.qrCodeData': qrData } });
+          { $set: { 'qrCodes.$.qrCodeData': qrData, 'qrCodes.$.createdAt':Date.now() } });
           
             if (!updateResult) {
               // handle error
@@ -129,6 +129,82 @@ const saveQr = async (req, res) => {
   }
 };
 
+const updateQr = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const { imageName, qrName } = req.body;
+
+    const filePath = `./public/QR_Codes/${userId}/${imageName}`;
+
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    
+      console.log('File has been deleted successfully!');
+    });
+
+    const existingQrCodes = await qrCodesModel.findOne({ userId }).exec();
+
+    console.log(existingQrCodes);
+
+    if (existingQrCodes) {
+      let flag = false;
+      for (let qr of existingQrCodes.qrCodes) {
+        if (qr.qrCodeName === qrName) {
+          flag = true;
+          break;
+        }
+      }
+      if (!flag) {
+        res.json({
+          success: false,
+          status: " NOT FOUND",
+          message: "No Such QrCode Exists",
+        });
+      } else {
+        const filter = { userId: userId };
+        const update = { $pull: { qrCodes: { qrCodeName: qrName } } };
+        const options = { new: true };
+
+        const updatedDocument = await qrCodesModel.findOneAndUpdate(filter, update, options).exec();
+        console.log("updatedDocument", updatedDocument);
+        
+
+        if (!updatedDocument) {
+          // handle error
+          res.status(500).json({
+            status: "FAILED",
+            message: "An error occurred while updating QR code",
+            error: error.message,
+          });
+        } else {
+          // updateResult contains the updated document
+          console.log("updateResult", updatedDocument);
+          res.json({
+            success: true,
+            status: "DELETED",
+            message: "QR code with the following name Deleted",
+          });
+        }
+      }
+    } else {
+      res.json({
+        success: false,
+        status: "NOT FOUND",
+        message: "No QrCode Wth the provided User Id Exists",
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "FAILED",
+      message: "An error occurred while saving QR code",
+      error: error.message,
+    });
+  }
+};
 
 
   //Get profile picture
@@ -174,5 +250,6 @@ const sendQr = async (req, res) => {
   module.exports = {
     saveQr,
     sendQr,
+    updateQr,
     upload
   };
