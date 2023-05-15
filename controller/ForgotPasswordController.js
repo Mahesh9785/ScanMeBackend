@@ -29,6 +29,7 @@ const sendResetPassMail= async (req, res) => {
     }
   });
 
+  const currentUrl = "http://localhost:3000/";
   // create the email message
   const message = {
     from: process.env.AUTH_EMAIL, // change to your email
@@ -36,8 +37,8 @@ const sendResetPassMail= async (req, res) => {
     subject: 'Password Reset',
     text: `You are receiving this email because you (or someone else) has requested a password reset for your account. <br>
     Please click on the following link or paste it into your browser to complete the process: <br>
-    <a href=${"http://"+req.headers.host+"/reset-password/"+email+"/"+token}>Reset Password</a>
-    <br>If you did not request this, please ignore this email and your password will remain unchanged.\n`
+    <a href=${currentUrl+"/reset-password?email="+email+"&token="+token}>Reset Password</a>
+    <br>If you did not request this, please ignore this email and your password will remain unchanged.`
   };
 
   // send the email
@@ -48,8 +49,11 @@ const sendResetPassMail= async (req, res) => {
     }
 
     console.log('Email sent: ' + info.response);
-    res.status(200).send('Email sent');
-  });
+    res.status(200).json({
+      success: true,
+      status: "SUCCESS",
+      message: "Password email sent successfully!",
+    });  });
 
 }
 

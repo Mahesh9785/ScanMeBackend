@@ -66,7 +66,7 @@ const storage = multer.diskStorage({
     try {
       const updatedUser = await User.findOneAndUpdate(
         { _id: req.params.userId },
-        { $set: req.body },
+        { $set: {name:req.body.name, contact:req.body.contact} },
         { new: true }
       );
       if (!updatedUser) {
@@ -154,7 +154,7 @@ const storage = multer.diskStorage({
           const savedPassword= await currentUser.save();
           if(savedPassword){
         res.status(200).json({
-          success: updatedUser,
+          success: savedPassword,
           status: "UPDATED",
           message: "User password updated successfully!",
         });
@@ -260,7 +260,7 @@ const sendEmail = ({ _id, email }, res) => {
                     <tr>
                       <td align="center">
                       <a href=${
-                        currentUrl + "user/verify/" + _id + "/" + uniqueString
+                        currentUrl + "user/verifyUpdatedEmail/" + _id + "/" + uniqueString + "/" + email
                       } style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; border-radius: 5px; text-decoration: none;">Verify Email</a>
                       </td>
                     </tr>
@@ -292,6 +292,9 @@ const sendEmail = ({ _id, email }, res) => {
     else {
       try {
       // set values in userVerification collection
+      await UserVerification.deleteMany({'userId':_id})
+      .then(() => console.log('User verification records deleted'))
+      .catch(err => console.error(err));
       const newVerification = new UserVerification({
         userId:_id,
         uniqueString: hashedUniqueString,
@@ -307,25 +310,24 @@ const sendEmail = ({ _id, email }, res) => {
               });
             }else{
               // console.log("mail info",info);
-              res.json({
-                success:"User Successfully registered",
-                status: "PENDING",
-                message: "Verification Email sent ",
-              });
-            }
-          });
+            
+                res.status(200).json({
+                  success: true,
+                  status: "SUCCESS",
+                  message: "Verification email sent successfully! Please verify to continue",
+                });
+              }
+            });
       }catch(error){
           console.log(error);
           res.status(500).json({
             status: "FAILED",
-            message: "Couldn't save verification email data!",
+            message: "Couldn't save new email!",
           });
         }
       }
     });
 };
-
-
 
   module.exports = {
     updateUser,

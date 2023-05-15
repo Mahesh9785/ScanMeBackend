@@ -13,7 +13,7 @@ const verifyUser = async (req, res) => {
 
         // check if user is verified
         if (!result.verified) {
-            res.status(500).json({
+            res.status(403).json({
             status: "FAILED",
             message: "Email hasn't been verified yet. Check your inbox",
             });
@@ -32,7 +32,7 @@ const verifyUser = async (req, res) => {
         
         //If no match is found
         if (!isAuthenticated) {
-            res.status(401).json({ 
+            res.status(404).json({ 
                 status:"FAILED",
                 message: "Authentication failed" 
             });
@@ -40,7 +40,7 @@ const verifyUser = async (req, res) => {
     }
     }else{
         //if no user with the provided email exists
-        res.status(500).json({ 
+        res.status(401).json({ 
             status:"FAILED",
             message: "No such Email ID exists, If you are a new user please register" 
         });

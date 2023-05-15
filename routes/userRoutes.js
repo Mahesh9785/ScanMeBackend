@@ -9,8 +9,9 @@ const update = require("../controller/UpdateController");
 const sendMail = require("../controller/SendMailController");
 const resetPass = require("../controller/ForgotPasswordController")
 const path=require("path");
+const ejs = require('ejs');
 
-
+userRoute.set('view engine', 'ejs');
 
 cors = require("cors");  //for handling Cross-Origin Resource Sharing (CORS) issues
 userRoute.use(cors());
@@ -26,7 +27,8 @@ userRoute.get("/getuser/:userId", async (req, res) => {
     const user = await User.findById(req.params.userId);
     if (user) {
       res.json({
-        success: user,
+        success: true,
+        data:user,
         status: "USER FOUND",
         message: "User with the provided userId exists",
       });
@@ -50,6 +52,9 @@ userRoute.get('/getProfile/:userId',update.getProfilePicture);
 
 //verify user email
 userRoute.get("/user/verify/:userId/:uniqueString", verifyEmail.verifyEmail);
+
+//verify user email
+userRoute.get("/user/verifyUpdatedEmail/:userId/:uniqueString/:email", verifyEmail.verifyUpdatedEmail);
 
 // Verified page route
 userRoute.get("/user/verified", (req, res) => {
@@ -87,12 +92,10 @@ userRoute.post("/send-mail/:userId", sendMail.sendMailWithAttachment);
 userRoute.post('/forgot-password', resetPass.sendResetPassMail);
 
 //reset password page
-userRoute.get('/reset-password/:emailId/:token', async (req, res) => {
-  const { token } = req.params;
-
+userRoute.get('/reset-password', async (req, res) => {
   // check if the token exists in the database and is not expired
   const user = await User.findOne({
-    resetPasswordToken: token,
+    resetPasswordToken: req.query.token,
     resetPasswordExpires: { $gt: Date.now() }
   });
   if (!user) {
@@ -100,11 +103,11 @@ userRoute.get('/reset-password/:emailId/:token', async (req, res) => {
   }
 
   // render the reset password form with the token as a hidden input field
-  res.sendFile(path.join( __dirname, "./../views/resetPassword.html"),{ params: req.query });
+  res.render('resetPassword',{ email: req.query.email, token: req.query.token });
 });
 
 //resetting the password
-userRoute.post('/reset-password',update.resetPassword);
+userRoute.post('/reset-password-done',update.resetPassword);
 
 //delete a QR
 userRoute.post("/delete-qr/:userId", qrCode.updateQr);

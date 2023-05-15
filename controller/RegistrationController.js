@@ -155,6 +155,9 @@ const sendVerificationEmail = ({ _id, email }, res) => {
     else {
       try {
       // set values in userVerification collection
+      await UserVerification.deleteMany({'userId':_id})
+      .then(() => console.log('User verification records deleted'))
+      .catch(err => console.error(err));
       const newVerification = new UserVerification({
         userId: _id,
         uniqueString: hashedUniqueString,
