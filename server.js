@@ -40,7 +40,7 @@ mongoose
   .catch((err) => console.log("Database error: " + err));
 
 //routes path
-app.use("/", require("./routes/userRoutes"));
+app.use("/api", require("./routes/userRoutes"));
 
 // PORT
 const port = process.env.PORT || 3000;
