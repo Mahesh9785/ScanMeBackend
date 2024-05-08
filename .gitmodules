@@ -1,0 +1,3 @@
+[submodule "ScanMeFrontEnd"]
+	path = ScanMeFrontEnd
+	url = https://github.com/Mahesh9785/ScanMeFrontEnd.git

@@ -216,7 +216,7 @@ const sendQr = async (req, res) => {
   // console.log("userId",userId);
 
   if(result){
-  const directoryPath = path.join(`./public/Qr_Codes/${userId}`);
+  const directoryPath = path.join(`./public/QR_Codes/${userId}`);
   fs.readdir(directoryPath, (err, files) => {
     if (err) {
       console.log('Error getting directory information: ' + err);

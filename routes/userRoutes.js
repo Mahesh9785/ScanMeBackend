@@ -58,7 +58,7 @@ userRoute.get("/user/verifyUpdatedEmail/:userId/:uniqueString/:email", verifyEma
 
 // Verified page route
 userRoute.get("/user/verified", (req, res) => {
-    res.sendFile(path.join( __dirname, "./../views/verified.html"));
+    res.sendFile(path.join( __dirname, "./views/verified.html"));
 })
 
 //save user qrCode
