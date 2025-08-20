@@ -1,7 +1,5 @@
-# A descriptive name for your workflow
-name: Deploy Backend to Production
+name: Deploy Backend
 
-# Triggers the workflow on a push event to the main branch
 on:
   push:
     branches:
@@ -9,46 +7,25 @@ on:
 
 jobs:
   deploy:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository code
       - name: Checkout repository
-        uses: actions/checkout@v4 # Use the latest version for security and features
+        uses: actions/checkout@v4
 
-      # Step 2: Set up the Node.js environment
       - name: Setup Node.js
-        uses: actions/setup-node@v4 # Use the latest version
+        uses: actions/setup-node@v3
         with:
-          node-version: '20.x' # Use a stable LTS (Long-Term Support) version
-          cache: 'npm' # Cache npm dependencies for faster builds
+          node-version: '22.18.0'
 
-      # Step 3: Add server's host key to the runner's known_hosts file
-      - name: Add Server to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-          
-      # Step 4: Deploy the application to the server via SSH
       - name: Deploy Backend via SSH
-        uses: appleboy/ssh-action@v1.0.3 # Use the latest version of the SSH action
+        uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: jatin # Ensure this is the correct username
+          username: jatin
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Navigate to the application's directory on the server
             cd /home/jatin/apps/my-app/ScanMeBackend
-            
-            # Pull the latest changes from the main branch.
-            # It's important to let the workflow fail if the pull doesn't work.
-            git pull origin main
-            
-            # Use 'npm ci' for clean, reliable, and faster installs in CI/CD environments.
-            # It installs dependencies exactly as defined in your package-lock.json.
-            npm ci --production
-            
-            # Use 'reload' for a zero-downtime restart of your application.
-            # The '||' operator provides a fallback to start the app if it's not already running.
-            pm2 reload my-app || pm2 start server.js --name my-app
+            git pull origin main || true
+            npm install --production
+            pm2 restart my-app || pm2 start server.js --name my-app
