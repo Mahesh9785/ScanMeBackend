@@ -24,7 +24,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: feelsoul
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22673   
+          port: ${{ secrets.SERVER_PORT }} 
           script: |
             cd /home/feelsoul/apk/ScanMeBackend
             git pull origin main || true
