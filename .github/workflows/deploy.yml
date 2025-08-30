@@ -22,10 +22,10 @@ jobs:
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_IP }}
-          username: jatin
+          username: feelsoul
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/jatin/apps/my-app/ScanMeBackend
+            cd /home/feelsoul/apk/ScanMeBackend
             git pull origin main || true
             npm install --production
-            pm2 restart my-app || pm2 start server.js --name my-app
+            pm2 restart feelsoul || pm2 start server.js --name feelsoul
