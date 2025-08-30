@@ -25,6 +25,9 @@ jobs:
           username: feelsoul
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 2222
+          timeout: 90s                            # give network a bit more time
+          command_timeout: 30m
+          debug: true
           script: |
             cd /home/feelsoul/apk/ScanMeBackend
             git pull origin main || true
