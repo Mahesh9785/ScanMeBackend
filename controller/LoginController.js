@@ -26,7 +26,7 @@ const verifyUser = async (req, res) => {
             res.json({
                 status:'SUCCESS',
                 data:result,
-                message:'user verified successfully abc'
+                message:'user verified successfully final run'
             });
         }
         
