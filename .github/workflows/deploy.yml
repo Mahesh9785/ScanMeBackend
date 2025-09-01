@@ -31,8 +31,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/feelsoul/apk/ScanMeBackend && \
-            git pull && \
-            npm install && \
-            pm2 restart feelsoul || pm2 start npm --name "feelsoul" -- start
+            cd /home/feelsoul/apps/ScanMeBackend
+            git pull origin main
+            npm install
+            pm2 restart scanme-backend || pm2 start server.js --name scanme-backend
             pm2 save
