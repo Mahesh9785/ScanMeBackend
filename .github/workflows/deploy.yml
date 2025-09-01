@@ -19,7 +19,10 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-          
+
+      - name: Debug SSH connectivity
+        run: nc -vz -w 10 ${{ secrets.SERVER_HOST }} ${{ secrets.SERVER_PORT }}
+
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
