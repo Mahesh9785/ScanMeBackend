@@ -30,7 +30,7 @@ userRoute.get("/getuser/:userId", async (req, res) => {
         success: true,
         data: user,
         status: "USER FOUND Yayyyy!!!",
-        message: "User with the provided userId exists",
+        message: "User with the provided userId exists Mkjsjdhhjg ugjhdfgjgjf gggdgfj dsgfj ",
       });
     } else {
       res.status(500).json({
